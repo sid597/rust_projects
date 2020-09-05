@@ -3,7 +3,7 @@ use std::fs;
 fn main() {
     // Note did not use std::env because it is already imported 
     let args: Vec<String> = env::args().collect();
-    let config = parse_config(&args);
+    let config = Config::new(&args);
     println!("Searching for {}", config.query);
     println!("In file {}", config.filename);
     let contents = fs::read_to_string(config.filename).expect("something went wrong");
@@ -35,6 +35,7 @@ fn parse_config(args:&[String]) -> (&str, &str) {
 */
 
 
+/*
 /* Version 2 for parse_config */
 
 
@@ -54,9 +55,6 @@ However, cloning the data also makes our code very straightforward because we do
 
 */
 
-
-
-
 struct Config {
     query:String,
     filename:String
@@ -68,3 +66,43 @@ fn parse_config(args:&[String]) -> Config {
     let filename = args[2].clone();
     Config {query, filename}
 }
+
+*/
+
+
+/*
+/* Version 3 */
+
+
+/* 
+So now that the purpose of the `parse_config` function is to create a `Config` instance, we can change `parse_config` from a plain function to a function named `new` that is associated with the `Config` struct. 
+
+Making this change will make the code more idiomatic. We can create instances of types in the standard library, such as `String`, by calling `String::new`. Similarly, by changing `parse_config` into a `new` function associated with `Config`, we’ll be able to create instances of `Config` by calling `Config::new`.
+
+
+For error handling if the length of args is small :
+
+a call to panic! is more appropriate for a programming problem than a usage problem, so we will use `Result` in this case.
+*/
+
+
+struct Config {
+    query:String,
+    filename:String
+}
+
+impl Config{
+    fn new(args:&[String]) -> Config{
+        if args.len() < 3 {
+
+        }
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Config{query, filename}
+    }
+}
+
+
+*/
+
