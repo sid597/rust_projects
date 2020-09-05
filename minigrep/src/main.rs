@@ -1,25 +1,32 @@
-use std::env;
-use std::fs;
-fn main() {
-    // Note did not use std::env because it is already imported 
-    let args: Vec<String> = env::args().collect();
-    let config = Config::new(&args);
-    println!("Searching for {}", config.query);
-    println!("In file {}", config.filename);
-    let contents = fs::read_to_string(config.filename).expect("something went wrong");
-    println!("Contents of file are : \n{}", contents);
-}
-
 /*
 /* Version 1 for parse_config */
 
-fn parse_config(args:&[String]) -> (&str, &str) {
-    /* This rework may seem like overkill for our small program,
-     but we’re refactoring in small, incremental steps.*/
+use std::env;
+use std::fs;
 
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let (query, filename) = parse_config(&args);
+
+    // --snip--
+
+    println!("Searching for {}", query);
+    println!("In file {}", filename);
+
+    let contents = fs::read_to_string(filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+}
+
+fn parse_config(args: &[String]) -> (&str, &str) {
     let query = &args[1];
     let filename = &args[2];
+
     (query, filename)
+}
+
 
     /*
     We can take another small step to improve the `parse_config` function further. At the moment, we’re returning a tuple, but then we immediately break that tuple into individual parts again.
@@ -35,10 +42,10 @@ fn parse_config(args:&[String]) -> (&str, &str) {
 */
 
 
-/*
+
 /* Version 2 for parse_config */
 
-
+/*
 /*
  The signature of `parse_config` now indicates that it returns a `Config` value. In the body of `parse_config`, where we used to return string slices that reference `String` values in `args`, we now define `Config` to contain owned `String` values.
 
@@ -55,16 +62,35 @@ However, cloning the data also makes our code very straightforward because we do
 
 */
 
-struct Config {
-    query:String,
-    filename:String
+use std::env;
+use std::fs;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = parse_config(&args);
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    let contents = fs::read_to_string(config.filename)
+        .expect("Something went wrong reading the file");
+
+    // --snip--
+
+    println!("With text:\n{}", contents);
 }
 
-fn parse_config(args:&[String]) -> Config {
+struct Config {
+    query: String,
+    filename: String,
+}
 
+fn parse_config(args: &[String]) -> Config {
     let query = args[1].clone();
     let filename = args[2].clone();
-    Config {query, filename}
+
+    Config { query, filename }
 }
 
 */
@@ -86,23 +112,91 @@ a call to panic! is more appropriate for a programming problem than a usage prob
 */
 
 
-struct Config {
-    query:String,
-    filename:String
+use std::env;
+use std::fs;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args);
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    let contents = fs::read_to_string(config.filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+
+    // --snip--
 }
 
-impl Config{
-    fn new(args:&[String]) -> Config{
-        if args.len() < 3 {
+// --snip--
 
-        }
+struct Config {
+    query: String,
+    filename: String,
+}
+
+impl Config {
+    fn new(args: &[String]) -> Config {
         let query = args[1].clone();
         let filename = args[2].clone();
 
-        Config{query, filename}
+        Config { query, filename }
     }
 }
 
+
+*/
+
+
+// Version 4
+
+/*
+
+/*
+For error handling if the length of args is small :
+
+A call to panic! is more appropriate for a programming problem than a usage problem, so we will use `Result` in this case.
+
+*/
+
+
+use std::env;
+use std::fs;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args);
+
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.filename);
+
+    let contents = fs::read_to_string(config.filename)
+        .expect("Something went wrong reading the file");
+
+    println!("With text:\n{}", contents);
+}
+
+struct Config {
+    query: String,
+    filename: String,
+}
+
+impl Config {
+    fn new(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("not enough arguments");
+        }
+
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Ok(Config { query, filename })
+    }
+}
 
 */
 
